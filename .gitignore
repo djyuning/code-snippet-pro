@@ -1,0 +1,9 @@
+dist/*
+build/*
+coverage
+node_modules/
+*.log
+
+thumbs.db
+.gitkeep
+.DS_Store

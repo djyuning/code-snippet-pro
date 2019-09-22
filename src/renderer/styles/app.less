@@ -1,0 +1,344 @@
+// 滚动条
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 2px;
+  background-color: rgba(100, 100, 100, 0.3);
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+// 操作按钮
+.ivu-icon.handle {
+  border-radius: 2px;
+  color: #343c63;
+  display: block;
+  font-size: 16px;
+  height: 20px;
+  line-height: 20px;
+  margin: 2px;
+  text-align: center;
+  transition: background 0.3s ease, color 0.3s ease;
+  width: 20px;
+
+  &:hover {
+    background-color: #343c63;
+    color: white;
+  }
+
+  // 亮色
+  &.light {
+    color: white;
+
+    &:hover {
+      background-color: white;
+      color: #343c63;
+    }
+
+  }
+
+}
+
+////////////////////////////////////
+
+// 全局样式
+
+// 字体
+body {
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  font-size: 12px;
+  -webkit-font-smoothing: antialiased;
+
+  .danger {
+    color: #f00;
+  }
+
+}
+
+////////////////////////////////////
+
+// 覆盖 iView 样式
+body {
+
+  // 徽标字体修正
+  .ivu-badge-count {
+    font-family: inherit;
+  }
+
+  // 去除默认布局的背景色
+  .ivu-layout {
+    background-color: transparent;
+
+    // 内容自动伸展
+    &-content {
+      background-color: transparent;
+      flex-grow: 1;
+    }
+
+  }
+
+  // 文本框
+  textarea.ivu-input {
+    font-size: 12px;
+  }
+
+}
+
+////////////////////////////////////
+
+// CodeMirror
+body {
+
+  .CodeMirror {
+    font-family: inherit;
+    font-size: inherit;
+    height: calc(~"100vh - 32px - 41px - 24px");
+
+    &-vscrollbar,
+    &-hscrollbar,
+    &-scrollbar-filler,
+    &-gutter-filler {
+      outline: none;
+    }
+
+  }
+
+}
+
+////////////////////////////////////
+
+body .theme-checker {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  position: relative;
+
+  &-wrap {
+    max-height: 400px;
+    overflow: auto;
+    padding: 20px;
+    position: relative;
+  }
+
+  .cover {
+    background-color: white;
+    border: 1px #eee solid;
+    border-radius: 3px;
+    display: block;
+    font-size: 0;
+    height: 88px;
+    padding: 2px;
+    position: relative;
+    width: 168px;
+
+    img {
+      background-color: #fafafa;
+      border-radius: 1px;
+      height: 100%;
+      width: 100%;
+    }
+  }
+
+  .title {
+    display: block;
+    text-align: center;
+    line-height: 24px;
+    margin-top: 8px;
+    margin-bottom: 16px;
+  }
+
+  // 适配组件
+  .ivu-radio-wrapper {
+    margin: 10px;
+
+    &-checked {
+
+      .cover {
+        background-color: #d5dee7;
+        border-color: #343c63;
+        box-shadow: 0 1px 3px fadeout(#343c63, 70%);
+      }
+
+      .title {
+        color: #343c63;
+        font-weight: bold;
+      }
+
+    }
+
+    .ivu-radio {
+      height: 100%;
+      left: 0;
+      opacity: 0;
+      position: absolute;
+      top: 0;
+      width: 100%;
+    }
+  }
+}
+
+////////////////////////////////////
+
+// 应用布局
+
+body .app-main {
+  background-color: #343c63;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+
+  // 头部
+  &-header {
+    align-items: center;
+    background-color: white;
+    display: flex;
+    flex-shrink: 0;
+    height: 32px;
+    padding: 0;
+    position: relative;
+
+    // 底部边框
+    &::before {
+      background-color: #c9d2de;
+      content: '';
+      left: 0;
+      right: 0;
+      bottom: 0;
+      position: absolute;
+      height: 1px;
+      transform: scaleY(0.3);
+    }
+
+    &::after {
+      bottom: 4px;
+      content: "";
+      left: 418px;
+      right: 144px;
+      top: 4px;
+      position: absolute;
+      z-index: 0;
+      -webkit-app-region: drag;
+    }
+
+    div,
+    span {
+      position: relative;
+      z-index: 3;
+    }
+
+    // 标题栏
+    .titlebar {
+      background-color: red;
+      position: absolute;
+      right: 0;
+      top: 0;
+      z-index: 4;
+    }
+
+    .logo {
+      background-color: transparent;
+      color: #5cc779;
+      font-size: 14px;
+      font-weight: bold;
+      display: inline-block;
+      height: 32px;
+      line-height: 32px;
+      padding: 0 16px;
+      text-align: center;
+      -webkit-user-select: none;
+      -webkit-app-region: drag;
+    }
+
+    // 操作项
+    .handle {
+      color: #344563;
+      cursor: default;
+      display: block;
+      font-size: 12px;
+      line-height: 30px;
+      padding: 0 16px;
+      user-select: none;
+
+      &:hover {
+        background-color: transparent;
+        color: #5cc779;
+      }
+    }
+  }
+
+  // 主侧边
+  &-side {
+    background-color: #343c63;
+    border-right: 1px #343c63 solid;
+    overflow: auto;
+  }
+
+  // 次侧边
+  &-sub-side {
+    background-color: #d5dee7;
+    border-right: 1px #ced7e0 solid;
+
+    // 文章列表
+    .article-list {
+      height: calc(~"100% - 52px - 53px");
+    }
+
+    // 操作按钮
+    &-options {
+      background-color: white;
+      border-top: 1px #ced7e0 solid;
+      padding: 10px;
+    }
+  }
+
+  // 内容
+  &-content {
+    background-color: white;
+    position: relative;
+  }
+
+}
+
+// 窗口控制器
+.window-control {
+  display: flex;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 999;
+  -webkit-user-select: none;
+
+  .control {
+    align-items: center;
+    display: flex;
+    height: 30px;
+    justify-content: center;
+    text-align: center;
+    width: 48px;
+
+    svg {
+      width: 10px;
+    }
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    // 关闭按钮显示红色
+    &.closebel:hover {
+      background-color: #fd4747;
+
+      svg polygon {
+        fill: white;
+      }
+
+    }
+  }
+}
