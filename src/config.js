@@ -8,7 +8,7 @@ const config = {
   },
 
   homePage: 'http://www.tperiod.com/',
-  feedbackPage: 'https://github.com/djyuning/winTenFocusWallpaper/issues',
+  feedbackPage: 'https://github.com/djyuning/code-snippet-pro/issues',
 
 };
 

@@ -2,7 +2,7 @@
   "name": "code-snippet",
   "version": "0.0.1",
   "author": "djyuning <djyuning@126.com>",
-  "description": "An electron-vue project",
+  "description": "代码片段管理工具 - 好记性不如烂笔头^_^",
   "license": "MIT",
   "main": "./dist/electron/main.js",
   "scripts": {
@@ -28,6 +28,8 @@
       "dist/electron/**/*"
     ],
     "dmg": {
+      "background": "src/build/dmg/bg.png",
+      "icon": "src/build/icons/icon.icns",
       "contents": [
         {
           "x": 410,
@@ -43,13 +45,13 @@
       ]
     },
     "mac": {
-      "icon": "src/icons/icon.icns"
+      "icon": "src/build/icons/icon.icns"
     },
     "win": {
-      "icon": "src/icons/icon.ico"
+      "icon": "src/build/icons/icon.ico"
     },
     "linux": {
-      "icon": "src/icons"
+      "icon": "src/build/icons"
     }
   },
   "dependencies": {

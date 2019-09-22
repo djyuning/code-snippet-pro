@@ -3,6 +3,8 @@
 import {
   app,
   BrowserWindow,
+  Menu,
+  MenuItem,
   shell,
   ipcMain
 } from 'electron'
@@ -37,42 +39,79 @@ function createWindow() {
     x: 40,
     y: 40,
   })
-
-  // 隐藏菜单项
-  mainWindow.setMenuBarVisibility(false);
-
+  
   mainWindow.loadURL(winURL)
+
+  /////////////////////////////////////////////////////////////
+
+  // Mac 平台需要添加原生菜单
+  if (process.platform === 'darwin') {
+    const template = [{
+        label: "Application",
+        submenu: [{
+          label: "Quit",
+          accelerator: "Command+Q",
+          click: function () {
+            app.quit();
+          }
+        }]
+      },
+      {
+        label: "Edit",
+        submenu: [{
+            label: "Copy",
+            accelerator: "CmdOrCtrl+C",
+            selector: "copy:"
+          },
+          {
+            label: "Paste",
+            accelerator: "CmdOrCtrl+V",
+            selector: "paste:"
+          },
+        ]
+      }
+    ];
+    Menu.setApplicationMenu(Menu.buildFromTemplate(template))
+  } else {
+    Menu.setApplicationMenu(null)
+    mainWindow.setMenuBarVisibility(false)
+  }
+
+  /////////////////////////////////////////////////////////////
 
   // 拦截内部链接
   mainWindow.webContents.on('will-navigate', (event, url) => {
     // 拦截特殊的 URL
     if (!url.includes('http://localhost') && !url.includes('file://')) {
-      shell.openExternal(url);
-      event.preventDefault();
+      shell.openExternal(url)
+      event.preventDefault()
     }
-
   });
+
+  /////////////////////////////////////////////////////////////
 
   // 最小化
   ipcMain.on('window-minimize', (event, args) => {
-    mainWindow.minimize();
-  });
+    mainWindow.minimize()
+  })
 
   // 切换窗口最大化和还原
   ipcMain.on('window-toggle', (event, args) => {
     if (mainWindow.isMaximized()) {
-      mainWindow.restore();
-      mainWindow.webContents.send('window-toggle', false);
+      mainWindow.restore()
+      mainWindow.webContents.send('window-toggle', false)
     } else {
-      mainWindow.maximize();
-      mainWindow.webContents.send('window-toggle', true);
+      mainWindow.maximize()
+      mainWindow.webContents.send('window-toggle', true)
     }
-  });
+  })
 
   // 退出应用
   ipcMain.on('window-close', (event, args) => {
-    mainWindow.close();
-  });
+    mainWindow.close()
+  })
+
+  /////////////////////////////////////////////////////////////
 
   // 监听窗口尺寸变化
   mainWindow.on('resize', () => {

@@ -36,7 +36,7 @@ export default {
     codeFontFamily: "Consolas,Menlo,Courier,monospace",
 
     // 字号
-    codeFontSize: 0,
+    codeFontSize: 12,
 
     // 自动换行
     wordWrap: false,
