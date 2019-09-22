@@ -90,8 +90,8 @@ let webConfig = {
       filename: 'index.html',
       template: path.resolve(__dirname, '../src/index.ejs'),
       minify: {
-        collapseWhitespace: true,
-        removeAttributeQuotes: true,
+        collapseWhitespace: false,
+        removeAttributeQuotes: false,
         removeComments: true
       },
       nodeModules: false

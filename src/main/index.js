@@ -85,17 +85,13 @@ function createWindow() {
 
 }
 
-// 禁止多开窗口
-const shouldQuit = app.makeSingleInstance((commandLine, workingDirectory) => {
-  if (mainWindow) {
-    if (mainWindow.isMinimized()) mainWindow.restore()
-    mainWindow.focus()
+app.on('second-instance', (event, commandLine, workingDirectory) => {
+  // 当运行第二个实例时,将会聚焦到myWindow这个窗口
+  if (myWindow) {
+    if (myWindow.isMinimized()) myWindow.restore()
+    myWindow.focus()
   }
 })
-
-if (shouldQuit) {
-  app.quit()
-}
 
 app.on('ready', createWindow)
 
@@ -110,23 +106,3 @@ app.on('activate', () => {
     createWindow()
   }
 })
-
-/**
- * Auto Updater
- *
- * Uncomment the following code below and install `electron-updater` to
- * support auto updating. Code Signing with a valid certificate is required.
- * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-electron-builder.html#auto-updating
- */
-
-/*
-import { autoUpdater } from 'electron-updater'
-
-autoUpdater.on('update-downloaded', () => {
-  autoUpdater.quitAndInstall()
-})
-
-app.on('ready', () => {
-  if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
-})
- */
