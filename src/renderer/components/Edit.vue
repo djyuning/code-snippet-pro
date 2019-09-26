@@ -176,7 +176,7 @@ export default {
         this.cm.setOption("mode", lang);
 
         // 设置编辑器内容
-        this.cm.refresh();
+        this.$refs.codemirror.initialize();
       },
       deep: true
     },
