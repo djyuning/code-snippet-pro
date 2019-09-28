@@ -131,7 +131,16 @@ export default {
         line: true,
         lineWrapping: this.wordWrap, // 超出长度换行
         foldGutter: true,
-        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
+        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+        extraKeys: {
+          // 保存修改
+          "Ctrl-S": editor => {
+            this.$store.dispatch("Contents/updateArticle", this.article);
+          },
+          "Cmd-S": editor => {
+            this.$store.dispatch("Contents/updateArticle", this.article);
+          }
+        }
       };
     },
 

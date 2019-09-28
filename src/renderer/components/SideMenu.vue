@@ -13,6 +13,10 @@ export default {
       type: Number,
       default: 0
     },
+
+    // 高亮节点
+    active: [String],
+
     // 是否展开
     expand: {
       type: Boolean,

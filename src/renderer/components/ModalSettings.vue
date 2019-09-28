@@ -14,6 +14,14 @@
       <!-- 全局设置 -->
       <div v-if="tab === 'basic'" class="form-wrap">
         <Form class="form" ref="form" :label-width="120">
+          <FormItem label="数据存储位置" prop="icon">
+            <Input :value.sync="appCachePath" disabled>
+              <template slot="append">
+                <Icon size="16" type="ios-folder-open" @click.native="openFileHandler"></Icon>
+              </template>
+            </Input>
+          </FormItem>
+
           <FormItem label="界面主题" prop="theme">
             <RadioGroup v-model="form.theme" @on-change="handleThemeChange">
               <Radio
@@ -34,13 +42,12 @@
           </FormItem>
 
           <FormItem label="代码字号" prop="codeFontSize">
-            <Input
+            <InputNumber
               v-model="form.codeFontSize"
-              placeholder="14"
+              :min="9"
+              :max="24"
               @on-change="handleCodeFontSizeChange"
-            >
-              <span slot="append">px</span>
-            </Input>
+            />
           </FormItem>
 
           <FormItem label="自动换行" prop="wordWrap">
@@ -117,7 +124,8 @@ export default {
   },
   computed: {
     ...mapState({
-      settings: state => state.Settings
+      settings: state => state.Settings,
+      appCachePath: state => state.Contents.appCachePath
     })
   },
   watch: {
@@ -163,6 +171,12 @@ export default {
 
     handleAutoSaveIntervalChange() {
       this.dispatchAction("setAutoSaveInterval", this.form.autoSaveInterval);
+    },
+
+    // 打开缓存目录
+    openFileHandler() {
+      const { shell } = require("electron").remote;
+      shell.showItemInFolder(this.appCachePath);
     }
   },
   mounted() {

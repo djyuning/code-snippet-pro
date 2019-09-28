@@ -1,5 +1,5 @@
 <template>
-  <div :class="['side-menu-item', expand ? 'expand' : '']">
+  <div :class="classes">
     <div class="handler" :style="handleStyle" @click="handleClick">
       <Icon v-if="item.icon" class="icons" :type="item.icon" />
       <span class="name">{{ item.title }}</span>
@@ -54,15 +54,26 @@ export default {
   },
   data() {
     return {
-      expand: false
+      expand: false,
+      root: null, // 根节点
+      active: false
     };
   },
   computed: {
+    classes: function() {
+      return {
+        item: true,
+        active: this.root.active === this.$props.item.uuid,
+        expand: this.expand
+      };
+    },
+
     handleStyle: function() {
       return {
         paddingLeft: `${this.$props.level * 12}px`
       };
     },
+
     hasChild: function() {
       let item = this.$props.item;
       if (!item) return false;
@@ -70,6 +81,15 @@ export default {
     }
   },
   methods: {
+    // 递归获取当前元素发父组件，直到找到顶层的 SideMenu
+    _getRootMenu(node) {
+      let $parent = node.$parent;
+      if ($parent.$parent.$options._componentTag === "SideMenuItem") {
+        return this._getRootMenu(node.$parent.$parent);
+      }
+      return $parent;
+    },
+
     handleDropdownClick(name) {
       let item = this.$props.item;
 
@@ -102,17 +122,21 @@ export default {
     handleClick() {
       // 如果有子级，展开子级
       if (this.hasChild) {
-        return (this.expand = !this.expand);
+        this.expand = !this.expand;
       }
       // 触发条目点击
-      this.$emit("on-change", this.$props.item);
+      this.root.$emit("on-change", this.$props.item);
     }
+  },
+  created() {
+    // 获取根菜单
+    this.root = this._getRootMenu(this);
   }
 };
 </script>
 
 <style lang="less" scoped>
-.side-menu-item {
+.side-menu > .item {
   position: relative;
   user-select: none;
 
@@ -199,6 +223,14 @@ export default {
       .options {
         display: block;
       }
+    }
+  }
+
+  // 高亮
+  &.active {
+    & > .handler {
+      color: white;
+      text-shadow: 1px 1px 0 #6a7491;
     }
   }
 

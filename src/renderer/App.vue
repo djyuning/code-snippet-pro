@@ -18,47 +18,70 @@
           <!-- 文件夹 -->
           <SidePanel title="文件夹" icon="md-archive">
             <Icon slot="options" class="handle light" type="md-add" @click="modalEditFold = true" />
-            <SideMenu>
+            <SideMenu :active="foldActive" @on-change="handleFoldChange">
               <SideMenuItem v-for="(fold, index) in treeFolds" :key="index" :item="fold" options />
             </SideMenu>
           </SidePanel>
 
           <!-- 语言 -->
           <SidePanel title="语言" icon="md-document">
-            <SideMenu>
-              <SideMenuItem
-                v-for="(mod, index) in modes"
-                :key="index"
-                :item="mod"
-                @on-change="handleLangChange"
-              />
+            <SideMenu @on-change="handleLangChange">
+              <SideMenuItem v-for="(mod, index) in modes" :key="index" :item="mod" />
             </SideMenu>
           </SidePanel>
 
           <!-- 标签 -->
           <SidePanel title="标签" icon="md-pricetags">
-            <Icon slot="options" class="handle light" type="md-add" @click="modalEditTag = true" />
-            <Tag color="warning" v-for="(tag, index) in tags" :key="index">{{ tag.title }}</Tag>
+            <template slot="options">
+              <Icon
+                v-if="!editTags"
+                class="handle light"
+                type="md-create"
+                @click="editTags = true"
+              />
+              <Icon
+                v-if="editTags"
+                class="handle light"
+                type="md-checkmark"
+                @click="editTags = false"
+              />
+              <Icon class="handle light" type="md-add" @click="modalEditTag = true" />
+            </template>
+            <Tag
+              color="primary"
+              v-for="(tag, index) in tags"
+              :key="index"
+              :closable="editTags"
+              @on-close="handleTagDelete(index, tag)"
+            >{{ tag.title }}</Tag>
           </SidePanel>
         </Sider>
         <Layout>
           <Sider class="app-main-sub-side" :width="subSideSize">
-            <div class="serach-wrap" style="padding: 10px;">
-              <Search v-model="searchKeyword" />
-            </div>
+            <PasswordCheck
+              v-if="foldActiveLock"
+              :tips="foldActiveData.passwordTips"
+              @on-submit="checkActiveFoldPassword"
+            />
 
-            <ArticleList ref="articleList" class="article-list">
-              <ArticleRow
-                v-for="(article, index) in allArticles"
-                :key="article.uuid"
-                :article="article"
-                @on-change="editArticle = article"
-              />
-            </ArticleList>
+            <template v-if="!foldActiveLock">
+              <div class="serach-wrap" style="padding: 10px;">
+                <Search v-model="searchKeyword" />
+              </div>
 
-            <div class="app-main-sub-side-options">
-              <Button type="success" @click="handleCreate" long>新建文章</Button>
-            </div>
+              <ArticleList ref="articleList" class="article-list">
+                <ArticleRow
+                  v-for="(article, index) in allArticles"
+                  :key="article.uuid"
+                  :article="article"
+                  @on-change="editArticle = article"
+                />
+              </ArticleList>
+
+              <div class="app-main-sub-side-options">
+                <Button type="success" @click="handleCreate" long>创建</Button>
+              </div>
+            </template>
           </Sider>
           <Content class="app-main-content">
             <Welcome v-show="!editArticle" />
@@ -127,7 +150,8 @@ export default {
     ArticleList: () => import("@/components/ArticleList"),
     ArticleRow: () => import("@/components/ArticleRow"),
     Edit: () => import("@/components/Edit"),
-    Search: () => import("@/components/Search")
+    Search: () => import("@/components/Search"),
+    PasswordCheck: () => import("@/components/PasswordCheck")
   },
   data() {
     return {
@@ -136,15 +160,14 @@ export default {
       mainSideSizeCollspace: 64,
       subSideSize: 240,
       maximize: false,
-
       modalEditFold: false,
       modalEditTag: false,
       modalSettings: false,
       modalAbout: false,
-
       allArticles: [],
       searchKeyword: "",
-      searchTimer: null
+      searchTimer: null,
+      editTags: false
     };
   },
   computed: {
@@ -152,7 +175,10 @@ export default {
       editArticle: state => state.Contents.editArticle,
       articles: state => state.Contents.articles,
       folds: state => state.Contents.folds,
-      tags: state => state.Contents.tags
+      tags: state => state.Contents.tags,
+      foldActive: state => state.Contents.foldActive,
+      foldActiveData: state => state.Contents.foldActiveData,
+      foldActiveLock: state => state.Contents.foldActiveLock
     }),
 
     // 递归处理的目录
@@ -251,7 +277,12 @@ export default {
     // 新建片段
     handleCreate() {
       this.$store.dispatch("Contents/addArticle");
-      this.$store.dispatch("Contents/setEditArticle", this.articles[0]);
+    },
+
+    // 文件目录选择
+    handleFoldChange(fold) {
+      this.$store.dispatch("Contents/setEditArticle", null);
+      this.$store.dispatch("Contents/setActiveFold", fold);
     },
 
     // 菜单事件监听
@@ -270,6 +301,16 @@ export default {
       }
     },
 
+    // 验证文件夹访问密码
+    checkActiveFoldPassword(password) {
+      if (password === this.foldActiveData.password) {
+        this.$store.dispatch("Contents/unlockActiveFold");
+        this.$Message.success("解锁成功!");
+      } else {
+        this.$Message.error("密码错误，请重新输入!");
+      }
+    },
+
     // 语言标签可查看文章
     handleLangChange(item) {
       let lang = item.title;
@@ -284,9 +325,12 @@ export default {
       this.allArticles = [...this.articles].filter(
         article => article.lang === lang
       );
-    }
+    },
 
-    /////////////////////////////////////////////
+    // 删除标签
+    handleTagDelete(index, tag) {
+      this.$store.dispatch("Contents/deleteTag", tag.uuid);
+    }
   },
   mounted() {
     // 响应窗口尺寸变化
@@ -294,11 +338,16 @@ export default {
       this.maximize = isMaximized ? true : false;
     });
 
+    // 初始化用户数据存储位置
+    ipcRenderer.send("get-user-data-path");
+    ipcRenderer.on("get-user-data-path", (e, userDataPath) => {
+      this.$store.dispatch("Contents/setPathUserData", userDataPath);
+    });
+
+    // 初始化高亮目录
+
     // 获取全部文章
     this.allArticles = [...this.articles];
-  },
-  destroyed() {
-    //titlebar.destroy();
   }
 };
 </script>

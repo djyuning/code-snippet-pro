@@ -71,6 +71,7 @@
 </template>
 
 <script>
+import { ipcRenderer } from "electron";
 import { mapState, mapActions } from "vuex";
 
 // 默认字段
@@ -105,7 +106,8 @@ export default {
   },
   computed: {
     ...mapState({
-      folds: state => state.Contents.folds
+      folds: state => state.Contents.folds,
+      appCachePath: state => state.App.appCachePath
     }),
 
     // 递归处理数组，增加缩进效果
@@ -133,16 +135,13 @@ export default {
   watch: {
     value: function(val) {
       this.modal = val;
-
       // 初始化数据
-      let input = this.$props.fold;
-      this.form = { ...DEFAULT, ...input };
-      this.formEdit = { ...DEFAULT, ...input };
+      const input = this.$props.fold;
+      const form = { ...DEFAULT, ...input };
+      this.form = form;
+      this.formEdit = form;
     },
     modal: function(val) {
-      if (!val) {
-        this.formEdit = { ...DEFAULT };
-      }
       this.$emit("input", val);
     }
   },
@@ -155,8 +154,13 @@ export default {
       this.modal = false;
     },
     handleSubmit() {
+      // 创建到缓存
+      this.$store.dispatch(
+        this.formEdit.uuid ? "Contents/updateFold" : "Contents/addFold",
+        { ...this.formEdit }
+      );
+      // 关闭弹窗
       this.modal = false;
-      this.$store.dispatch("Contents/addFold", { ...this.formEdit });
     }
   }
 };

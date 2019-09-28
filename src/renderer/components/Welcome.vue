@@ -2,8 +2,11 @@
   <div class="welcome">
     <div class="welcome-content">
       <Complete :title="$config.app.title" :title-sub="$config.app.slogan">
+        <div slot="cover">
+          <img src="static/logo-in-about.png" srcset="static/logo-in-about@2x.png 2x" alt />
+        </div>
         <div class="options">
-          <Button type="primary" size="small" @click="handleCreate">新建片段</Button>
+          <Button type="success" @click="handleCreate">新建片段</Button>
         </div>
       </Complete>
     </div>

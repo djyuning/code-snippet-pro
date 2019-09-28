@@ -39,7 +39,7 @@ function createWindow() {
     x: 40,
     y: 40,
   })
-  
+
   mainWindow.loadURL(winURL)
 
   /////////////////////////////////////////////////////////////
@@ -87,6 +87,13 @@ function createWindow() {
       event.preventDefault()
     }
   });
+
+  /////////////////////////////////////////////////////////////
+
+  // 获取缓存目录
+  ipcMain.on('get-user-data-path', (event, args) => {
+    mainWindow.webContents.send('get-user-data-path', app.getPath('userData'));
+  })
 
   /////////////////////////////////////////////////////////////
 

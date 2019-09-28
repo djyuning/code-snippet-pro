@@ -1,7 +1,9 @@
 <template>
   <div class="complete">
     <div class="inner">
-      <Icon v-if="icon" class="icon" :type="icon" />
+      <slot name="cover">
+        <Icon v-if="icon" class="icon" :type="icon" />
+      </slot>
       <h1 class="title" v-if="title">{{ title }}</h1>
       <h4 class="title-sub" v-if="titleSub">{{ titleSub }}</h4>
       <p class="contents" v-if="contents">{{ contents }}</p>
