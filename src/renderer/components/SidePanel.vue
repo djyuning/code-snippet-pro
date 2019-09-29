@@ -67,7 +67,7 @@ export default {
       }
 
       h4 {
-        color: white;
+        color: #7c8da9;
         flex-grow: 1;
         font-size: 12px;
         font-weight: bold;

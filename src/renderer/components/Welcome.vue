@@ -1,12 +1,12 @@
 <template>
   <div class="welcome">
     <div class="welcome-content">
-      <Complete :title="$config.app.title" :title-sub="$config.app.slogan">
+      <Complete :title-sub="$config.app.title" :contents="$config.app.slogan">
         <div slot="cover">
           <img src="static/logo-in-about.png" srcset="static/logo-in-about@2x.png 2x" alt />
         </div>
         <div class="options">
-          <Button type="success" @click="handleCreate">新建片段</Button>
+          <Button type="success" @click="handleCreate">创建</Button>
         </div>
       </Complete>
     </div>
@@ -38,7 +38,6 @@ export default {
 <style lang="less" scoped>
 .welcome {
   align-items: center;
-  background-color: #f0f3f9;
   bottom: 0;
   display: flex;
   justify-content: center;

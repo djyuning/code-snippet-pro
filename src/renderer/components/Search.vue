@@ -55,8 +55,8 @@ export default {
 
 <style lang="less" scoped>
 .search {
-  border: 1px #616b88 solid;
-  background-color: #6a7491;
+  border: 1px #eee solid;
+  background-color: white;
   border-radius: 4px;
   min-height: 32px;
   overflow: hidden;

@@ -20,6 +20,7 @@
                 <Icon size="16" type="ios-folder-open" @click.native="openFileHandler"></Icon>
               </template>
             </Input>
+            <p class="tips">该目录为当前应用的数据保存目录，为系统自动生成，不可更改。</p>
           </FormItem>
 
           <FormItem label="界面主题" prop="theme">
@@ -39,6 +40,9 @@
               placeholder="Consolas,Menlo,Courier,monospace"
               @on-change="handleCodeFontFamilyChange"
             ></Input>
+            <p
+              class="tips"
+            >代码中常见的字体是 Consolas、Courier New、monospace，建议选择适合阅读的字体。系统默认字体设置为 “Consolas, "Courier New", Courier, monospace,微软雅黑”</p>
           </FormItem>
 
           <FormItem label="代码字号" prop="codeFontSize">
@@ -48,6 +52,7 @@
               :max="24"
               @on-change="handleCodeFontSizeChange"
             />
+            <p class="tips">最小字号为 9 像素，最大字号为 24 像素。</p>
           </FormItem>
 
           <FormItem label="自动换行" prop="wordWrap">
@@ -55,6 +60,7 @@
               <span slot="open">开启</span>
               <span slot="close">关闭</span>
             </i-switch>
+            <p class="tips">为了便于阅读，建议开启自动换行。</p>
           </FormItem>
 
           <FormItem label="显示行号" prop="lineNumber">
@@ -62,6 +68,7 @@
               <span slot="open">开启</span>
               <span slot="close">关闭</span>
             </i-switch>
+            <p class="tips">开启后，代码编辑器的左侧会显示对应的行号。</p>
           </FormItem>
 
           <FormItem label="自动保存" prop="autoSave" @on-change="handleAutoSaveChange">
@@ -69,6 +76,7 @@
               <span slot="open">开启</span>
               <span slot="close">关闭</span>
             </i-switch>
+            <p class="tips">应用默认开启自动保存功能。</p>
           </FormItem>
 
           <FormItem label="自动保存间隔" prop="autoSaveInterval">
@@ -237,5 +245,13 @@ export default {
   margin: 48px auto;
   padding-right: 64px;
   width: 480px;
+
+  // 提示文本
+  .tips {
+    color: #999;
+    font-size: 12px;
+    line-height: 18px;
+    margin-top: 8px;
+  }
 }
 </style>

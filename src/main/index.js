@@ -35,7 +35,7 @@ function createWindow() {
     minHeight: 680,
     minWidth: 960,
     title: 'Code Snippet Pro',
-    titleBarStyle: 'customButtonsOnHover',
+    titleBarStyle: 'hidden',
     x: 40,
     y: 40,
   })

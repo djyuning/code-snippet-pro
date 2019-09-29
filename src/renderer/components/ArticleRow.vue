@@ -17,7 +17,11 @@
 
       <div class="attrs">
         <Tag class="tag" color="success">{{ article.lang }}</Tag>
-        <Tag class="tag" color="cyan" v-if="article.content && article.content.length">字数: {{ article.content.length }}</Tag>
+        <Tag
+          class="tag"
+          color="cyan"
+          v-if="article.content && article.content.length"
+        >字数: {{ article.content.length }}</Tag>
       </div>
       <div class="datetime">{{ article.createAt }}</div>
     </div>
@@ -26,7 +30,6 @@
         <Icon class="handle" type="md-settings" />
         <DropdownMenu slot="list">
           <DropdownItem name="moveTo">移动到</DropdownItem>
-          <DropdownItem name="moveTo">设为私密</DropdownItem>
           <DropdownItem class="danger" name="delete">删除</DropdownItem>
         </DropdownMenu>
       </Dropdown>
@@ -70,6 +73,12 @@ export default {
     },
 
     handleDropdownClick(name) {
+      // 移动文章
+      if (name === "moveTo") {
+        this.$emit("on-handle-move", this.$props.article);
+        return;
+      }
+
       // 删除文章
       if (name === "delete") {
         this.$Modal.confirm({
@@ -96,8 +105,8 @@ export default {
 
 <style lang="less" scoped>
 .article-row {
-  border-top: 1px #ced7e0 solid;
   cursor: default;
+  margin-bottom: 1px;
   padding: 16px 10px;
   position: relative;
   user-select: none;
@@ -207,12 +216,13 @@ export default {
   // 划过
   &:hover,
   &.current {
-    background-color: #f8f9fc;
+    background-color: #e1e4ec;
 
     // 信息
     .info {
       .title {
-        color: #333;
+        color: #111;
+        font-weight: bold;
       }
     }
 

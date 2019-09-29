@@ -4,6 +4,14 @@
 
 基于 electron 和 Vue.js 开发的一个代码片段管理工具，支持 Windows 和 Mac 系统。
 
+## 截图
+
+|截图|截图|
+|:---:|:---:|
+|![主面板](screenshot/001.png)|![新建目录](screenshot/002.png)|
+|![全局设置](screenshot/003.png)|![代码风格](screenshot/004.png)|
+|![关于面板](screenshot/005.png)|![MarkDown 预览](screenshot/006.png)|
+
 ## 开发
 
 ``` bash

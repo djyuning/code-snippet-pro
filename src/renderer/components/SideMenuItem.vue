@@ -1,9 +1,15 @@
 <template>
   <div :class="classes">
-    <div class="handler" :style="handleStyle" @click="handleClick">
-      <Icon v-if="item.icon" class="icons" :type="item.icon" />
-      <span class="name">{{ item.title }}</span>
-      <div v-if="options" class="options">
+    <div class="handler" :style="handleStyle">
+      <Icon
+        v-if="item.icon"
+        class="icons"
+        :type="item.icon"
+        :style="iconStyle"
+        @click="handleClick"
+      />
+      <span class="name" @click="handleClick">{{ item.title }}</span>
+      <div v-if="options && item.uuid !== 'default'" class="options">
         <Dropdown placement="bottom-end" @on-click="handleDropdownClick" transfer>
           <Icon class="handle" type="md-settings" />
           <DropdownMenu slot="list">
@@ -63,11 +69,20 @@ export default {
     classes: function() {
       return {
         item: true,
-        active: this.root.active === this.$props.item.uuid,
+        active: this.root.active && this.root.active === this.$props.item.uuid,
         expand: this.expand
       };
     },
 
+    // 图标yangshi
+    iconStyle: function() {
+      let { item } = this.$props;
+      return {
+        color: item.color || "#7c8da9"
+      };
+    },
+
+    // 条目属性
     handleStyle: function() {
       return {
         paddingLeft: `${this.$props.level * 12}px`
@@ -95,6 +110,7 @@ export default {
 
       // 编辑
       if (name === "edit") {
+        this.root.$emit("on-edit", this.$props.item);
         return;
       }
 
@@ -119,7 +135,7 @@ export default {
       }
     },
 
-    handleClick() {
+    handleClick(e) {
       // 如果有子级，展开子级
       if (this.hasChild) {
         this.expand = !this.expand;
@@ -211,8 +227,8 @@ export default {
 
     // 划过
     &:hover {
-      background-color: #6a7491;
-      color: white;
+      background-color: #eee;
+      color: #333;
 
       // 箭头高亮
       .icons-arrow {
@@ -229,18 +245,17 @@ export default {
   // 高亮
   &.active {
     & > .handler {
-      color: white;
-      text-shadow: 1px 1px 0 #6a7491;
+      background-color: #e1e4ec;
+      color: #7c8da9;
     }
   }
 
   // 已展开
   &.expand > .handler {
-    color: white;
-    text-shadow: 1px 1px 0 #6a7491;
+    color: #7c8da9;
 
     .icons-arrow {
-      color: white;
+      color: #7c8da9;
       transform: rotate(180deg);
     }
   }

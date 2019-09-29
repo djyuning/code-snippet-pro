@@ -5,8 +5,8 @@
  */
 import uuidv1 from "uuid/v1";
 import moment from "moment";
+import Message from 'iview/src/components/message';
 
-const md5 = require('md5');
 const fs = require("fs");
 const path = require("path");
 const CryptoJS = require("crypto-js");
@@ -133,7 +133,7 @@ export default {
       state.articles.splice(index, 1);
 
       // 切换高亮
-      if (state.editArticle.uuid === uuid) {
+      if (state.editArticle && state.editArticle.uuid === uuid) {
         this.dispatch('Contents/setEditArticle', state.articles.length ? state.articles[0] : null);
       }
 
@@ -143,10 +143,66 @@ export default {
         console.error(error);
       });
       if (fs.existsSync(article) && stat && stat.isFile) {
-        fs.unlinkSync(article, error => {
-          console.error(error);
+        fs.unlink(article, error => {
+          if (error) {
+            console.error(error);
+            Message.error(error);
+            return;
+          }
+          Message.success('删除成功！');
         });
       }
+    },
+
+    // 移动文章到指定目录
+    moveArticleToFold(state, options) {
+      if (!options || Object.prototype.toString.call(options) !== '[object Object]') {
+        return Message.error('无效的操作！');
+      }
+
+      options = Object.assign({}, {
+        article: null, // 操作的文章
+        target: null, // 目标文件夹
+      }, options);
+
+      if (!options.article || !options.article.uuid) {
+        return Message.error('无效的操作，移动的文章不存在！');
+      }
+
+      if (!options.target || !options.target.uuid) {
+        return Message.error('无效的操作，目标文件夹不存在！');
+      }
+
+      // 获取目录地址
+      let targetPath = path.join(state.appCachePath, options.target.uuid);
+      let articlePath = path.join(state.appCachePath, state.foldActive, options.article.uuid);
+
+      // 目录不存在
+      let targetStat = fs.statSync(targetPath);
+      if (!targetStat || !targetStat.isDirectory) {
+        return Message.error('无效的操作，目标文件夹不存在！');
+      }
+
+      // 文章不存在
+      let articleStat = fs.statSync(articlePath);
+      if (!articleStat || !articleStat.isFile) {
+        return Message.error('无效的操作，移动的文章不存在！');
+      }
+
+      // 移动文件
+      fs.copyFile(articlePath, path.join(targetPath, options.article.uuid), error => {
+        if (error) {
+          return Message.error(error || '移动失败！');
+        }
+
+        // 删除源文件
+        fs.unlink(articlePath);
+
+        // 刷新当前目录
+        this.dispatch('Contents/readArticlesByFoldID', state.foldActive);
+
+        Message.success('移动成功！');
+      });
     },
 
     /////////////////////////////////////////////
@@ -221,8 +277,13 @@ export default {
 
       // 删除硬盘中的目录
       const fold = path.join(state.appCachePath, "/", uuid);
-      fs.rmdirSync(fold, error => {
-        console.error(error);
+      fs.rmdir(fold, error => {
+        if (error) {
+          console.error(error);
+          Message.error(error);
+          return;
+        }
+        Message.success('删除成功！');
       });
     },
 
@@ -368,6 +429,10 @@ export default {
 
     deleteArticle(context, uuid) {
       context.commit('deleteArticle', uuid);
+    },
+
+    moveArticleToFold(context, options) {
+      context.commit('moveArticleToFold', options);
     },
 
     /////////////////////////////////////////////

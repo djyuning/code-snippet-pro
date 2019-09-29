@@ -3,14 +3,20 @@
     <div class="about">
       <div class="logo">
         <img src="static/logo-in-about.png" srcset="static/logo-in-about@2x.png 2x" alt />
-        <span class="title">{{ $config.app.title }}</span>
-        <span class="slogan">{{ $config.app.slogan }}</span>
+        <span class="title">{{ pkg.build.productName }}</span>
+        <span class="slogan">{{ pkg.description }}</span>
+        <span class="slogan">版本 {{ pkg.version }}</span>
       </div>
 
-      <div class="body">
+      <div class="body" v-if="dependencies.length">
         <p>
           特别感谢
-          <br />vue-codemirror，vue-electron，vue-highlight.js，iView，Vue.js，codemirror，electron，axios，@mdi/font
+          <br />
+          <br />
+          <template v-for="(pack, index) in dependencies">
+            <a :key="index" :href="`https://www.npmjs.com/package/${pack}`">{{ pack }}</a>
+            <template v-if="index < dependencies.length - 1">、</template>
+          </template>
         </p>
       </div>
 
@@ -24,6 +30,7 @@
 
 <script>
 import { shell } from "electron";
+import pkg from "../../../package";
 
 export default {
   name: "ModalAbout",
@@ -33,8 +40,15 @@ export default {
   },
   data() {
     return {
-      modal: this.$props.value
+      modal: this.$props.value,
+      pkg
     };
+  },
+  computed: {
+    dependencies: function() {
+      if (!this.pkg) return [];
+      return Object.keys(this.pkg.dependencies);
+    }
   },
   watch: {
     value: function(val) {

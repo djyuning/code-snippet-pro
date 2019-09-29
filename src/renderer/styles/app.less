@@ -1,12 +1,12 @@
 // 滚动条
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-thumb {
-  border-radius: 2px;
-  background-color: rgba(100, 100, 100, 0.3);
+  border-radius: 3px;
+  background-color: rgba(100, 100, 100, 0.5);
 }
 
 ::-webkit-scrollbar-track {
@@ -205,7 +205,7 @@ body .app-main {
     position: relative;
 
     // 底部边框
-    &::before {
+    &::after {
       background-color: #c9d2de;
       content: '';
       left: 0;
@@ -216,78 +216,111 @@ body .app-main {
       transform: scaleY(0.3);
     }
 
-    &::after {
-      bottom: 4px;
-      content: "";
-      left: 418px;
-      right: 144px;
-      top: 4px;
-      position: absolute;
-      z-index: 0;
+    // 可拖动元素
+    .split {
+      flex: 1;
+      height: 100%;
       -webkit-app-region: drag;
     }
 
-    div,
-    span {
-      position: relative;
-      z-index: 3;
-    }
-
-    // 标题栏
-    .titlebar {
-      background-color: red;
-      position: absolute;
-      right: 0;
-      top: 0;
-      z-index: 4;
-    }
-
+    // LOGO
     .logo {
       background-color: transparent;
       color: #5cc779;
       font-size: 14px;
       font-weight: bold;
-      display: inline-block;
+      display: block;
       height: 32px;
       line-height: 32px;
       padding: 0 16px;
       text-align: center;
-      -webkit-user-select: none;
       -webkit-app-region: drag;
     }
 
     // 操作项
-    .handle {
-      color: #344563;
-      cursor: default;
-      display: block;
-      font-size: 12px;
-      line-height: 30px;
-      padding: 0 16px;
-      user-select: none;
+    .menu-main {
+      display: flex;
+      position: relative;
 
-      &:hover {
-        background-color: transparent;
-        color: #5cc779;
+      // 操作项
+      &-item {
+        color: #344563;
+        cursor: default;
+        display: block;
+        font-size: 12px;
+        line-height: 30px;
+        padding: 0 16px;
+        user-select: none;
+
+        &:hover {
+          background-color: transparent;
+          color: #5cc779;
+        }
       }
     }
+
+    // 窗口控制器
+    .window-control {
+      display: flex;
+      -webkit-user-select: none;
+
+      &-mac {
+        padding-left: 8px;
+      }
+
+      // 控件
+      .control {
+        align-items: center;
+        display: flex;
+        height: 30px;
+        justify-content: center;
+        text-align: center;
+        width: 18px;
+
+        svg {
+          height: 10px;
+          width: 10px;
+        }
+
+        // windows 控件稍宽
+        &.win {
+          width: 48px;
+        }
+
+        &.win:hover {
+          background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        // 关闭按钮显示红色
+        &.closebel:hover {
+          background-color: #fd4747;
+
+          svg polygon {
+            fill: white;
+          }
+
+        }
+      }
+    }
+
+
   }
 
   // 主侧边
   &-side {
-    background-color: #343c63;
-    border-right: 1px #343c63 solid;
+    background-color: #ffffff;
+    border-right: 1px #fafafa solid;
     overflow: auto;
   }
 
   // 次侧边
   &-sub-side {
-    background-color: #d5dee7;
-    border-right: 1px #ced7e0 solid;
+    background-color: #ebf1f8;
+    border-right: 1px #fafafa solid;
 
     // 文章列表
     .article-list {
-      height: calc(~"100% - 52px - 53px");
+      height: calc(~"100% - 53px");
     }
 
     // 操作按钮
@@ -304,41 +337,4 @@ body .app-main {
     position: relative;
   }
 
-}
-
-// 窗口控制器
-.window-control {
-  display: flex;
-  position: fixed;
-  right: 0;
-  top: 0;
-  z-index: 999;
-  -webkit-user-select: none;
-
-  .control {
-    align-items: center;
-    display: flex;
-    height: 30px;
-    justify-content: center;
-    text-align: center;
-    width: 48px;
-
-    svg {
-      width: 10px;
-    }
-
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.1);
-    }
-
-    // 关闭按钮显示红色
-    &.closebel:hover {
-      background-color: #fd4747;
-
-      svg polygon {
-        fill: white;
-      }
-
-    }
-  }
 }

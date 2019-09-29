@@ -191,12 +191,8 @@ export default {
     },
 
     currentLang: function(lang) {
-      this.$store.dispatch("Contents/updateArticle", {
-        ...this.article,
-        ...{
-          lang
-        }
-      });
+      this.article.lang = lang;
+      this.$store.dispatch("Contents/updateArticle", this.article);
     }
   },
   methods: {

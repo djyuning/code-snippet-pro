@@ -2,23 +2,106 @@
   <div id="app">
     <Layout class="app-main">
       <header ref="header" class="app-main-header">
+        <div class="window-control window-control-mac" v-if="isMac">
+          <div class="control" @click="handleWindowClose ">
+            <svg x="0" y="0" viewBox="0 0 10 10">
+              <circle
+                fill="#ff5e54"
+                stroke="rgba(0, 0, 0, .1)"
+                stroke-width="0.5"
+                cx="5"
+                cy="5"
+                r="5"
+              />
+            </svg>
+          </div>
+          <div class="control" @click="handleWindowMinimize">
+            <svg x="0" y="0" viewBox="0 0 10 10">
+              <circle
+                fill="#ffbf06"
+                stroke="rgba(0, 0, 0, .1)"
+                stroke-width="0.5"
+                cx="5"
+                cy="5"
+                r="5"
+              />
+            </svg>
+          </div>
+          <div class="control" @click="handleWindowMaximize">
+            <svg x="0" y="0" viewBox="0 0 10 10">
+              <circle
+                fill="#12cc3a"
+                stroke="rgba(0, 0, 0, .1)"
+                stroke-width="0.5"
+                cx="5"
+                cy="5"
+                r="5"
+              />
+            </svg>
+          </div>
+        </div>
+
         <div class="logo">{{ $config.app.title }}</div>
-        <Dropdown placement="bottom-start" @on-click="handleMenuDropdownClick">
-          <span class="handle">文件</span>
-          <DropdownMenu slot="list">
-            <DropdownItem name="addArticle">新建片段</DropdownItem>
-            <DropdownItem name="quite">退出</DropdownItem>
-          </DropdownMenu>
-        </Dropdown>
-        <span class="handle" @click="modalSettings = true">偏好</span>
-        <span class="handle" @click="modalAbout = true">关于</span>
+
+        <div class="menu-main">
+          <Dropdown placement="bottom-start" @on-click="handleMenuDropdownClick">
+            <span class="menu-main-item">文件</span>
+            <DropdownMenu slot="list">
+              <DropdownItem name="addArticle">创建</DropdownItem>
+              <DropdownItem name="addFold">创建目录</DropdownItem>
+              <DropdownItem name="addTag">创建标签</DropdownItem>
+              <DropdownItem name="quite">退出</DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+          <span class="menu-main-item" @click="modalSettings = true">偏好</span>
+          <span class="menu-main-item" @click="modalAbout = true">关于</span>
+        </div>
+
+        <div class="split"></div>
+
+        <div class="window-control" v-if="isWin">
+          <div class="control win" @click="handleWindowMinimize">
+            <svg x="0" y="0" viewBox="0 0 10 1">
+              <rect fill="#000000" width="10" height="1" />
+            </svg>
+          </div>
+          <div class="control win" @click="handleWindowMaximize">
+            <svg v-if="!maximize" class="fullscreen-svg" x="0" y="0" viewBox="0 0 10 10">
+              <path
+                fill="#000000"
+                d="M 0 0 L 0 10 L 10 10 L 10 0 L 0 0 z M 1 1 L 9 1 L 9 9 L 1 9 L 1 1 z "
+              />
+            </svg>
+            <svg v-if="maximize" class="maximize-svg" x="0" y="0" viewBox="0 0 10 10">
+              <mask id="Mask">
+                <rect fill="#FFFFFF" width="10" height="10" />
+                <path fill="#000000" d="M 3 1 L 9 1 L 9 7 L 8 7 L 8 2 L 3 2 L 3 1 z" />
+                <path fill="#000000" d="M 1 3 L 7 3 L 7 9 L 1 9 L 1 3 z" />
+              </mask>
+              <path
+                fill="#000000"
+                d="M 2 0 L 10 0 L 10 8 L 8 8 L 8 10 L 0 10 L 0 2 L 2 2 L 2 0 z"
+                mask="url(#Mask)"
+              />
+            </svg>
+          </div>
+          <div class="control win closebel" @click="handleWindowClose">
+            <svg x="0" y="0" viewBox="0 0 10 10">
+              <polygon fill="#000000" points="10,1 9,0 5,4 1,0 0,1 4,5 0,9 1,10 5,6 9,10 10,9 6,5" />
+            </svg>
+          </div>
+        </div>
       </header>
       <Layout>
         <Sider class="app-main-side" :width="mainSideSize">
+          <div class="serach-wrap" style="padding: 10px;">
+            <Search v-model="searchKeyword" />
+          </div>
+
           <!-- 文件夹 -->
           <SidePanel title="文件夹" icon="md-archive">
-            <Icon slot="options" class="handle light" type="md-add" @click="modalEditFold = true" />
-            <SideMenu :active="foldActive" @on-change="handleFoldChange">
+            <Icon slot="options" class="handle" type="md-add" @click="modalEditFold = true" />
+            <SideMenu :active="foldActive" @on-change="handleFoldChange" @on-edit="handleFoldEdit">
               <SideMenuItem v-for="(fold, index) in treeFolds" :key="index" :item="fold" options />
             </SideMenu>
           </SidePanel>
@@ -33,22 +116,11 @@
           <!-- 标签 -->
           <SidePanel title="标签" icon="md-pricetags">
             <template slot="options">
-              <Icon
-                v-if="!editTags"
-                class="handle light"
-                type="md-create"
-                @click="editTags = true"
-              />
-              <Icon
-                v-if="editTags"
-                class="handle light"
-                type="md-checkmark"
-                @click="editTags = false"
-              />
-              <Icon class="handle light" type="md-add" @click="modalEditTag = true" />
+              <Icon v-if="!editTags" class="handle" type="md-create" @click="editTags = true" />
+              <Icon v-if="editTags" class="handle" type="md-checkmark" @click="editTags = false" />
+              <Icon class="handle" type="md-add" @click="modalEditTag = true" />
             </template>
             <Tag
-              color="primary"
               v-for="(tag, index) in tags"
               :key="index"
               :closable="editTags"
@@ -65,16 +137,13 @@
             />
 
             <template v-if="!foldActiveLock">
-              <div class="serach-wrap" style="padding: 10px;">
-                <Search v-model="searchKeyword" />
-              </div>
-
               <ArticleList ref="articleList" class="article-list">
                 <ArticleRow
                   v-for="(article, index) in allArticles"
                   :key="article.uuid"
                   :article="article"
                   @on-change="editArticle = article"
+                  @on-handle-move="handleMoveArticle"
                 />
               </ArticleList>
 
@@ -91,50 +160,20 @@
       </Layout>
     </Layout>
 
-    <div class="window-control">
-      <div class="control minimize" @click="handleWindowMinimize">
-        <svg x="0" y="0" viewBox="0 0 10 1">
-          <rect fill="#000000" width="10" height="1" />
-        </svg>
-      </div>
-      <div class="control maximize" @click="handleWindowMaximize">
-        <svg v-if="!maximize" class="fullscreen-svg" x="0" y="0" viewBox="0 0 10 10">
-          <path
-            fill="#000000"
-            d="M 0 0 L 0 10 L 10 10 L 10 0 L 0 0 z M 1 1 L 9 1 L 9 9 L 1 9 L 1 1 z "
-          />
-        </svg>
-        <svg v-if="maximize" class="maximize-svg" x="0" y="0" viewBox="0 0 10 10">
-          <mask id="Mask">
-            <rect fill="#FFFFFF" width="10" height="10" />
-            <path fill="#000000" d="M 3 1 L 9 1 L 9 7 L 8 7 L 8 2 L 3 2 L 3 1 z" />
-            <path fill="#000000" d="M 1 3 L 7 3 L 7 9 L 1 9 L 1 3 z" />
-          </mask>
-          <path
-            fill="#000000"
-            d="M 2 0 L 10 0 L 10 8 L 8 8 L 8 10 L 0 10 L 0 2 L 2 2 L 2 0 z"
-            mask="url(#Mask)"
-          />
-        </svg>
-      </div>
-      <div class="control closebel" @click="handleWindowClose">
-        <svg x="0" y="0" viewBox="0 0 10 10">
-          <polygon fill="#000000" points="10,1 9,0 5,4 1,0 0,1 4,5 0,9 1,10 5,6 9,10 10,9 6,5" />
-        </svg>
-      </div>
-    </div>
-
-    <ModalEditFold v-model="modalEditFold" />
+    <ModalEditFold v-model="modalEditFold" :fold="editFold" />
     <ModalEditTag v-model="modalEditTag" />
 
     <ModalSettings v-model="modalSettings" />
     <ModalAbout v-model="modalAbout" />
+
+    <ModalMoveTo v-model="modalMoveTo" :tips="movingArticleTips" @on-change="handleMoveToChange" />
   </div>
 </template>
 
 <script>
 import { ipcRenderer } from "electron";
 import { mapState } from "vuex";
+import hotkeys from "hotkeys-js";
 
 export default {
   name: "App",
@@ -147,6 +186,7 @@ export default {
     ModalEditTag: () => import("@/components/ModalEditTag"),
     ModalSettings: () => import("@/components/ModalSettings"),
     ModalAbout: () => import("@/components/ModalAbout"),
+    ModalMoveTo: () => import("@/components/ModalMoveTo"),
     ArticleList: () => import("@/components/ArticleList"),
     ArticleRow: () => import("@/components/ArticleRow"),
     Edit: () => import("@/components/Edit"),
@@ -155,6 +195,8 @@ export default {
   },
   data() {
     return {
+      isMac: process.platform === "darwin",
+      isWin: process.platform.indexOf("win") !== -1,
       // 主侧边栏的尺寸
       mainSideSize: 200,
       mainSideSizeCollspace: 64,
@@ -164,10 +206,14 @@ export default {
       modalEditTag: false,
       modalSettings: false,
       modalAbout: false,
+      modalMoveTo: false,
       allArticles: [],
       searchKeyword: "",
       searchTimer: null,
-      editTags: false
+      editTags: false,
+      editFold: null,
+      movingArticle: null,
+      movingArticleTips: ''
     };
   },
   computed: {
@@ -233,9 +279,24 @@ export default {
     // 搜索文章
     searchKeyword: function(keyword) {
       this.searchFilter(keyword);
+    },
+
+    // 目录窗口关闭时，清除编辑的目录
+    modalEditFold: function(visible) {
+      if (!visible) {
+        this.editFold = null;
+      }
+    },
+
+    modalMoveTo: function(visible) {
+      if (!visible) {
+        this.movingArticle = null;
+        this.movingArticleTips = '';
+      }
     }
   },
   methods: {
+    // 窗口操作
     handleWindowMinimize() {
       ipcRenderer.send("window-minimize");
     },
@@ -274,9 +335,10 @@ export default {
 
     /////////////////////////////////////////////
 
-    // 新建片段
+    // 新建文章
     handleCreate() {
       this.$store.dispatch("Contents/addArticle");
+      this.$store.dispatch("Contents/setEditArticle", this.articles[0]);
     },
 
     // 文件目录选择
@@ -285,12 +347,29 @@ export default {
       this.$store.dispatch("Contents/setActiveFold", fold);
     },
 
+    // 编辑目录
+    handleFoldEdit(fold) {
+      this.editFold = fold;
+      this.modalEditFold = true;
+    },
+
     // 菜单事件监听
     handleMenuDropdownClick(name) {
       // 新建片段
       if (name === "addArticle") {
-        this.$store.dispatch("Contents/addArticle");
-        this.$store.dispatch("Contents/setEditArticle", this.articles[0]);
+        this.handleCreate();
+        return;
+      }
+
+      // 新建目录
+      if (name === "addFold") {
+        this.modalEditFold = true;
+        return;
+      }
+
+      // 新建标签
+      if (name === "addTag") {
+        this.modalEditTag = true;
         return;
       }
 
@@ -330,6 +409,23 @@ export default {
     // 删除标签
     handleTagDelete(index, tag) {
       this.$store.dispatch("Contents/deleteTag", tag.uuid);
+    },
+
+    // 唤醒移动文章
+    handleMoveArticle(article) {
+      this.movingArticle = article;
+      this.movingArticleTips = `正在移动《${ article.title }》到新的目录：`;
+      this.modalMoveTo = true;
+    },
+
+    // 确定移动文章
+    handleMoveToChange(target) {
+      console.log( target );
+      
+      this.$store.dispatch("Contents/moveArticleToFold", {
+        article: this.movingArticle,
+        target: target
+      });
     }
   },
   mounted() {
@@ -338,16 +434,50 @@ export default {
       this.maximize = isMaximized ? true : false;
     });
 
+    ////////////////////////////////////////////////////////////////
+
     // 初始化用户数据存储位置
     ipcRenderer.send("get-user-data-path");
     ipcRenderer.on("get-user-data-path", (e, userDataPath) => {
       this.$store.dispatch("Contents/setPathUserData", userDataPath);
     });
 
-    // 初始化高亮目录
+    ////////////////////////////////////////////////////////////////
+
+    // 快捷键
+
+    // 新建文章
+    hotkeys("ctrl+n, command+n", () => {
+      this.handleCreate();
+      return false;
+    });
+
+    // 新建目录
+    hotkeys("ctrl+f, command+f", () => {
+      this.modalEditFold = true;
+      return false;
+    });
+
+    // 新建标签
+    hotkeys("ctrl+t, command+t", () => {
+      this.modalEditTag = true;
+      return false;
+    });
+
+    // 打开设置面板
+    hotkeys("ctrl+k, command+k", () => {
+      this.modalSettings = true;
+      return false;
+    });
+
+    ////////////////////////////////////////////////////////////////
 
     // 获取全部文章
     this.allArticles = [...this.articles];
+  },
+  destroyed() {
+    // 移除快捷键监听
+    hotkeys.unbind("*");
   }
 };
 </script>

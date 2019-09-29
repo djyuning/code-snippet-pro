@@ -101,7 +101,7 @@ export default {
   data() {
     return {
       modal: this.$props.value,
-      formEdit: { ...DEFAULT, ...this.$props.fold }
+      formEdit: { ...DEFAULT, ...(this.$props.fold || {}) }
     };
   },
   computed: {
@@ -136,8 +136,7 @@ export default {
     value: function(val) {
       this.modal = val;
       // 初始化数据
-      const input = this.$props.fold;
-      const form = { ...DEFAULT, ...input };
+      const form = { ...DEFAULT, ...(this.$props.fold || {}) };
       this.form = form;
       this.formEdit = form;
     },
