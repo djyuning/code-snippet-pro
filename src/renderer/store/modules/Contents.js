@@ -51,6 +51,7 @@ export default {
     tags: [], // 标签
     pathUserData: null, // 用户数据存储目录
     appCachePath: null, // 应用缓存目录
+    pathDownload: null, // 用户下载目录
   },
 
   mutations: {
@@ -407,7 +408,11 @@ export default {
       }
 
       state.appCachePath = appCachePath;
-    }
+    },
+
+    setPathUserDownloadPath(state, downloadPath) {
+      state.pathDownload = downloadPath;
+    },
 
   },
 
@@ -475,6 +480,10 @@ export default {
 
     setPathUserData(context, userDataPath) {
       context.commit('setPathUserData', userDataPath);
+    },
+
+    setPathUserDownloadPath(context, downloadPath) {
+      context.commit('setPathUserDownloadPath', downloadPath);
     }
 
   }

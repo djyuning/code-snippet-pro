@@ -79,6 +79,11 @@ import "codemirror/addon/fold/foldgutter.js";
 import "codemirror/addon/fold/brace-fold.js";
 import "codemirror/addon/fold/comment-fold.js";
 
+import htmlToPDF from "html-pdf";
+import domtoimage from "dom-to-image";
+
+const path = require("path");
+
 export default {
   name: "Edit",
   components: {
@@ -103,6 +108,7 @@ export default {
   },
   computed: {
     ...mapState({
+      pathDownload: state => state.Contents.pathDownload,
       editArticle: state => state.Contents.editArticle,
       codeTheme: state => state.Settings.codeTheme,
       codeFontFamily: state => state.Settings.codeFontFamily,
@@ -199,6 +205,90 @@ export default {
     open(link) {
       this.$electron.shell.openExternal(link);
     },
+
+    // 导出当前编辑器内容为 PDF
+    exportAsPDF() {
+      // 显示遮罩
+      this.$Spin.show();
+
+      // 获取编辑器的内容
+      let contents = this.editArticle.content;
+      contents = contents.replace(/\</g, "&lt;");
+      contents = contents.replace(/\>/g, "&gt;");
+      contents = contents.replace(/\n/g, "<br/>");
+      contents = contents.replace(/\t/g, "&nbsp;&nbsp;");
+      contents = contents.replace(/\s/g, "&nbsp;");
+
+      let saveFilePath = path.join(
+        this.pathDownload,
+        this.editArticle.title + ".pdf"
+      );
+
+      // 基础样式
+      let printStyle =
+        "<style>body {font-size: 12px; font-family: Helvetica Neue,Helvetica,PingFang SC,Hiragino Sans GB,Microsoft YaHei,Arial,sans-serif, line-height: 28px; }</style>";
+
+      try {
+        htmlToPDF
+          .create([printStyle, contents].join(""), {
+            border: {
+              top: "1.54cm",
+              right: "1.17cm",
+              bottom: "1.54cm",
+              left: "1.17cm"
+            }
+          })
+          .toFile(saveFilePath, (error, res) => {
+            this.$Spin.hide();
+
+            if (error) {
+              console.error(error);
+              this.$Message.error(error || "导出失败！");
+              return;
+            }
+
+            this.$Message.success({
+              content: `导出成功，文件已保存到 ${saveFilePath}`,
+              duration: 0,
+              closable: true
+            });
+          });
+      } catch (error) {
+        this.$Spin.hide();
+        console.error(error);
+        this.$Message.error(error || "导出失败！");
+      }
+    },
+
+    // 保存为图片
+    exportAsImage() {
+      let code = document.querySelector(".CodeMirror-sizer");
+      let fileName = `${this.editArticle.title}.png`;
+
+      // 获取代码 DOM 的尺寸
+      let codeRect = code.getBoundingClientRect();
+
+      domtoimage
+        .toPng(code, {
+          bgcolor: window.getComputedStyle(
+            document.querySelector(".CodeMirror")
+          )["background-color"],
+          quality: 1,
+          height: codeRect.height,
+          width: codeRect.width
+        })
+        .then(dataURL => {
+          let link = document.createElement("a");
+          link.download = fileName;
+          link.href = dataURL;
+          link.click();
+        })
+        .catch(error => {
+          console.error("oops, something went wrong!", error);
+        });
+    },
+
+    //////////////////////////////////////////////////////////////////////////////
 
     // 更新鼠标位置
     updateCurrentPos() {
@@ -342,10 +432,6 @@ export default {
       overflow: hidden;
       height: 100%;
       position: relative;
-
-      &:last-of-type {
-        border-left: 1px #eee solid;
-      }
     }
 
     // markdown 预览

@@ -30,7 +30,8 @@
     "dmg": {
       "background": "src/build/dmg/bg.png",
       "icon": "src/build/icons/icon.icns",
-      "contents": [{
+      "contents": [
+        {
           "x": 410,
           "y": 150,
           "type": "link",
@@ -58,7 +59,9 @@
     "axios": "^0.18.0",
     "codemirror": "^5.48.4",
     "crypto-js": "^3.1.9-1",
+    "dom-to-image": "^2.6.0",
     "hotkeys-js": "^3.7.1",
+    "html-pdf": "^2.2.0",
     "iview": "^3.5.0",
     "moment": "^2.24.0",
     "uuid": "^3.3.3",

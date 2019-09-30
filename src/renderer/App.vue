@@ -44,13 +44,31 @@
         <div class="logo">{{ $config.app.title }}</div>
 
         <div class="menu-main">
-          <Dropdown placement="bottom-start" @on-click="handleMenuDropdownClick">
+          <Dropdown placement="bottom-start" @on-click="handleMenuFileChange">
             <span class="menu-main-item">文件</span>
             <DropdownMenu slot="list">
               <DropdownItem name="addArticle">创建</DropdownItem>
               <DropdownItem name="addFold">创建目录</DropdownItem>
               <DropdownItem name="addTag">创建标签</DropdownItem>
-              <DropdownItem name="quite">退出</DropdownItem>
+              <DropdownItem name="exportArticleAsPNG" divided>导出当前文章为 PNG</DropdownItem>
+              <DropdownItem name="exportArticleAsPDF">导出当前文章为 PDF</DropdownItem>
+              <DropdownItem name disabled>导出当前目录为 PDF</DropdownItem>
+              <DropdownItem name="quite" divided>退出</DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+          <Dropdown placement="bottom-start" @on-click="handleMenuViewChange">
+            <span class="menu-main-item">视图</span>
+            <DropdownMenu slot="list">
+              <DropdownItem name="toggleResourceSide">
+                <template v-if="resourceSideCollapsed">显示边栏</template>
+                <template v-else>隐藏边栏</template>
+              </DropdownItem>
+              <DropdownItem name="toggleListSide">
+                <template v-if="listSideCollapsed">显示列表栏</template>
+                <template v-else>隐藏列表栏</template>
+              </DropdownItem>
+              <DropdownItem name disabled divided>卡片式列表栏</DropdownItem>
+              <DropdownItem name disabled divided>显示迷你地图</DropdownItem>
             </DropdownMenu>
           </Dropdown>
           <span class="menu-main-item" @click="modalSettings = true">偏好</span>
@@ -93,7 +111,7 @@
         </div>
       </header>
       <Layout>
-        <Sider class="app-main-side" :width="mainSideSize">
+        <Sider v-show="!resourceSideCollapsed" class="app-main-side" :width="mainSideSize">
           <div class="serach-wrap" style="padding: 10px;">
             <Search v-model="searchKeyword" />
           </div>
@@ -128,35 +146,38 @@
             >{{ tag.title }}</Tag>
           </SidePanel>
         </Sider>
-        <Layout>
-          <Sider class="app-main-sub-side" :width="subSideSize">
-            <PasswordCheck
-              v-if="foldActiveLock"
-              :tips="foldActiveData.passwordTips"
-              @on-submit="checkActiveFoldPassword"
-            />
+        <Sider v-show="!listSideCollapsed" class="app-main-sub-side" :width="subSideSize">
+          <PasswordCheck
+            v-if="foldActiveLock"
+            :tips="foldActiveData.passwordTips"
+            @on-submit="checkActiveFoldPassword"
+          />
 
-            <template v-if="!foldActiveLock">
-              <ArticleList ref="articleList" class="article-list">
-                <ArticleRow
-                  v-for="(article, index) in allArticles"
-                  :key="article.uuid"
-                  :article="article"
-                  @on-change="editArticle = article"
-                  @on-handle-move="handleMoveArticle"
-                />
-              </ArticleList>
+          <template v-if="!foldActiveLock">
+            <ArticleList ref="articleList" class="article-list">
+              <ArticleRow
+                v-for="(article, index) in allArticles"
+                :key="article.uuid"
+                :article="article"
+                @on-change="editArticle = article"
+                @on-handle-move="handleMoveArticle"
+              />
+            </ArticleList>
 
-              <div class="app-main-sub-side-options">
-                <Button type="success" @click="handleCreate" long>创建</Button>
-              </div>
-            </template>
-          </Sider>
-          <Content class="app-main-content">
-            <Welcome v-show="!editArticle" />
-            <Edit v-if="editArticle" :article="editArticle" @on-cancel="editArticle = null" />
-          </Content>
-        </Layout>
+            <div class="app-main-sub-side-options">
+              <Button type="success" @click="handleCreate" long>创建</Button>
+            </div>
+          </template>
+        </Sider>
+        <Content class="app-main-content">
+          <Welcome v-show="!editArticle" />
+          <Edit
+            v-if="editArticle"
+            ref="edit"
+            :article="editArticle"
+            @on-cancel="editArticle = null"
+          />
+        </Content>
       </Layout>
     </Layout>
 
@@ -196,7 +217,7 @@ export default {
   data() {
     return {
       isMac: process.platform === "darwin",
-      isWin: process.platform.indexOf("win") !== -1,
+      isWin: ["win", "win32", "win64"].includes(process.platform),
       // 主侧边栏的尺寸
       mainSideSize: 200,
       mainSideSizeCollspace: 64,
@@ -213,10 +234,11 @@ export default {
       editTags: false,
       editFold: null,
       movingArticle: null,
-      movingArticleTips: ''
+      movingArticleTips: ""
     };
   },
   computed: {
+    // 内容
     ...mapState({
       editArticle: state => state.Contents.editArticle,
       articles: state => state.Contents.articles,
@@ -225,6 +247,12 @@ export default {
       foldActive: state => state.Contents.foldActive,
       foldActiveData: state => state.Contents.foldActiveData,
       foldActiveLock: state => state.Contents.foldActiveLock
+    }),
+
+    // 视图
+    ...mapState({
+      resourceSideCollapsed: state => state.App.resourceSideCollapsed,
+      listSideCollapsed: state => state.App.listSideCollapsed
     }),
 
     // 递归处理的目录
@@ -291,7 +319,7 @@ export default {
     modalMoveTo: function(visible) {
       if (!visible) {
         this.movingArticle = null;
-        this.movingArticleTips = '';
+        this.movingArticleTips = "";
       }
     }
   },
@@ -354,7 +382,7 @@ export default {
     },
 
     // 菜单事件监听
-    handleMenuDropdownClick(name) {
+    handleMenuFileChange(name) {
       // 新建片段
       if (name === "addArticle") {
         this.handleCreate();
@@ -373,10 +401,33 @@ export default {
         return;
       }
 
+      // 导出当前文章为 PNG
+      if (name === "exportArticleAsPNG") {
+        this.$refs.edit.exportAsImage();
+        return;
+      }
+
+      // 导出当前文章为 PDF
+      if (name === "exportArticleAsPDF") {
+        this.$refs.edit.exportAsPDF();
+        return;
+      }
+
       // 退出应用
       if (name === "quite") {
         ipcRenderer.send("window-close");
         return;
+      }
+    },
+
+    // 视图菜单操作
+    handleMenuViewChange(name) {
+      if (name === "toggleResourceSide") {
+        return this.$store.dispatch("App/toggleResourceSide");
+      }
+
+      if (name === "toggleListSide") {
+        return this.$store.dispatch("App/toggleListSide");
       }
     },
 
@@ -414,14 +465,14 @@ export default {
     // 唤醒移动文章
     handleMoveArticle(article) {
       this.movingArticle = article;
-      this.movingArticleTips = `正在移动《${ article.title }》到新的目录：`;
+      this.movingArticleTips = `正在移动《${article.title}》到新的目录：`;
       this.modalMoveTo = true;
     },
 
     // 确定移动文章
     handleMoveToChange(target) {
-      console.log( target );
-      
+      console.log(target);
+
       this.$store.dispatch("Contents/moveArticleToFold", {
         article: this.movingArticle,
         target: target
@@ -440,6 +491,12 @@ export default {
     ipcRenderer.send("get-user-data-path");
     ipcRenderer.on("get-user-data-path", (e, userDataPath) => {
       this.$store.dispatch("Contents/setPathUserData", userDataPath);
+    });
+
+    // 初始化用户下载目录
+    ipcRenderer.send("get-user-download-path");
+    ipcRenderer.on("get-user-download-path", (e, downloadPath) => {
+      this.$store.dispatch("Contents/setPathUserDownloadPath", downloadPath);
     });
 
     ////////////////////////////////////////////////////////////////

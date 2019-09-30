@@ -35,7 +35,7 @@ function createWindow() {
     minHeight: 680,
     minWidth: 960,
     title: 'Code Snippet Pro',
-    titleBarStyle: 'hidden',
+    titleBarStyle: 'default',
     x: 40,
     y: 40,
   })
@@ -44,35 +44,8 @@ function createWindow() {
 
   /////////////////////////////////////////////////////////////
 
-  // Mac 平台需要添加原生菜单
-  if (process.platform === 'darwin') {
-    const template = [{
-        label: "Application",
-        submenu: [{
-          label: "Quit",
-          accelerator: "Command+Q",
-          click: function () {
-            app.quit();
-          }
-        }]
-      },
-      {
-        label: "Edit",
-        submenu: [{
-            label: "Copy",
-            accelerator: "CmdOrCtrl+C",
-            selector: "copy:"
-          },
-          {
-            label: "Paste",
-            accelerator: "CmdOrCtrl+V",
-            selector: "paste:"
-          },
-        ]
-      }
-    ];
-    Menu.setApplicationMenu(Menu.buildFromTemplate(template))
-  } else {
+  // win 平台隐藏基础菜单
+  if (process.platform !== 'darwin') {
     Menu.setApplicationMenu(null)
     mainWindow.setMenuBarVisibility(false)
   }
@@ -93,6 +66,11 @@ function createWindow() {
   // 获取缓存目录
   ipcMain.on('get-user-data-path', (event, args) => {
     mainWindow.webContents.send('get-user-data-path', app.getPath('userData'));
+  })
+
+  // 获取下载目录
+  ipcMain.on('get-user-download-path', (event, args) => {
+    mainWindow.webContents.send('get-user-download-path', app.getPath('downloads'));
   })
 
   /////////////////////////////////////////////////////////////
