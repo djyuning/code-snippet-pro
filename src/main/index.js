@@ -48,6 +48,105 @@ function createWindow() {
   if (process.platform !== 'darwin') {
     Menu.setApplicationMenu(null)
     mainWindow.setMenuBarVisibility(false)
+  } else {
+    // Mac 上需要启用部分原始菜单，否则会出现无法使用快捷键的问题
+    Menu.setApplicationMenu(Menu.buildFromTemplate([{
+        label: app.getName(),
+        submenu: [{
+            role: 'about'
+          },
+          {
+            type: 'separator'
+          },
+          {
+            role: 'services'
+          },
+          {
+            type: 'separator'
+          },
+          {
+            role: 'hide'
+          },
+          {
+            role: 'hideothers'
+          },
+          {
+            role: 'unhide'
+          },
+          {
+            type: 'separator'
+          },
+          {
+            role: 'quit'
+          }
+        ]
+      },
+      {
+        label: 'Edit',
+        submenu: [{
+            role: 'undo'
+          },
+          {
+            role: 'redo'
+          },
+          {
+            type: 'separator'
+          },
+          {
+            role: 'cut'
+          },
+          {
+            role: 'copy'
+          },
+          {
+            role: 'paste'
+          },
+          {
+            role: 'delete'
+          },
+          {
+            role: 'selectAll'
+          },
+        ]
+      },
+      {
+        label: 'View',
+        submenu: [{
+            role: 'reload'
+          },
+          {
+            role: 'forcereload'
+          },
+          {
+            type: 'separator'
+          },
+          {
+            role: 'resetzoom'
+          },
+          {
+            role: 'zoomin'
+          },
+          {
+            role: 'zoomout'
+          },
+        ]
+      },
+      {
+        label: 'Window',
+        submenu: [{
+            role: 'minimize'
+          },
+          {
+            role: 'zoom'
+          }, {
+            type: 'separator'
+          },
+          {
+            role: 'front'
+          },
+        ]
+      }
+    ]))
   }
 
   /////////////////////////////////////////////////////////////
