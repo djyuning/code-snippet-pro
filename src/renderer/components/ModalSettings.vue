@@ -15,7 +15,7 @@
       <div v-if="tab === 'basic'" class="form-wrap">
         <Form class="form" ref="form" :label-width="120">
           <FormItem label="数据存储位置" prop="icon">
-            <Input :value.sync="appCachePath" disabled>
+            <Input :value.sync="pathAppData" disabled>
               <template slot="append">
                 <Icon size="16" type="ios-folder-open" @click.native="openFileHandler"></Icon>
               </template>
@@ -101,7 +101,7 @@
         >
           <Radio v-for="(item, index) in theme" :key="index" :label="item">
             <span class="cover">
-              <img :src="`static/theme/${item}.png`" :alt="item" />
+              <img :src="`static/code-theme/${item}.png`" :alt="item" />
             </span>
             <span class="title">{{item}}</span>
           </Radio>
@@ -133,7 +133,7 @@ export default {
   computed: {
     ...mapState({
       settings: state => state.Settings,
-      appCachePath: state => state.Contents.appCachePath
+      pathAppData: state => state.App.pathAppData
     })
   },
   watch: {

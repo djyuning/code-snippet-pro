@@ -3,8 +3,6 @@
     <div class="about">
       <div class="logo">
         <img src="static/logo-in-about.png" srcset="static/logo-in-about@2x.png 2x" alt />
-        <span class="title">{{ pkg.build.productName }}</span>
-        <span class="slogan">{{ pkg.description }}</span>
         <span class="slogan">版本 {{ pkg.version }}</span>
       </div>
 
@@ -84,7 +82,7 @@ export default {
     img {
       display: block;
       margin: 24px auto 32px;
-      width: 48px;
+      width: 256px;
     }
 
     .title {

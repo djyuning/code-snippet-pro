@@ -3,7 +3,7 @@
     <div class="info">
       <Tooltip
         class="title-wrap"
-        :content="article.title"
+        :content="article.title || '无标题'"
         max-width="200"
         :delay="1000"
         placement="top-start"
@@ -11,7 +11,7 @@
       >
         <div class="title">
           <Icon class="icons" type="md-document" />
-          <h4>{{ article.title }}</h4>
+          <h4>{{ article.title || '无标题' }}</h4>
         </div>
       </Tooltip>
 
@@ -57,7 +57,7 @@ export default {
   },
   computed: {
     ...mapState({
-      editArticle: state => state.Contents.editArticle
+      editArticle: state => state.Article.editArticle
     }),
 
     current: function() {
@@ -68,7 +68,7 @@ export default {
   methods: {
     handleClick(e) {
       if (!this.$refs.options.contains(e.target)) {
-        this.$store.dispatch("Contents/setEditArticle", this.$props.article);
+        this.$store.dispatch("Article/setEditArticle", this.$props.article);
       }
     },
 
@@ -87,13 +87,10 @@ export default {
           onOk: () => {
             // 移除正在编辑的文章
             if (this.current) {
-              this.$store.dispatch("Contents/setEditArticle", null);
+              this.$store.dispatch("Article/setEditArticle", null);
             }
             // 删除当前文章
-            this.$store.dispatch(
-              "Contents/deleteArticle",
-              this.$props.article.uuid
-            );
+            this.$store.dispatch("Article/deleteArticle", this.$props.article);
           }
         });
         return;
@@ -214,7 +211,14 @@ export default {
   }
 
   // 划过
-  &:hover,
+  &:hover {
+    background-color: #fafafa;
+    // 显示操作
+    .options {
+      visibility: visible;
+    }
+  }
+
   &.current {
     background-color: #e1e4ec;
 

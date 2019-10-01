@@ -26,7 +26,7 @@ function createWindow() {
   // 实例化窗口
   mainWindow = new BrowserWindow({
     center: true,
-    frame: false,
+    frame: process.platform !== 'darwin' ? true : false,
     transparent: false,
     thickFrame: true,
     hasShadow: true,

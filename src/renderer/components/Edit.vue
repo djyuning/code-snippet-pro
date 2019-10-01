@@ -5,7 +5,11 @@
         <Icon class="item" type="md-arrow-back" @click="handleCancel" />
       </div>
       <div class="title">
-        <input v-model="article.title" placeholder="输入代码片段标题" @change="handleTitleChange" />
+        <Input
+          v-model="article.title"
+          placeholder="输入代码片段标题"
+          @on-change="handleTitleChange"
+        ></Input>
       </div>
     </div>
 
@@ -108,8 +112,14 @@ export default {
   },
   computed: {
     ...mapState({
-      pathDownload: state => state.Contents.pathDownload,
-      editArticle: state => state.Contents.editArticle,
+      editArticle: state => state.Article.editArticle
+    }),
+
+    ...mapState({
+      pathDownload: state => state.App.pathDownload
+    }),
+
+    ...mapState({
       codeTheme: state => state.Settings.codeTheme,
       codeFontFamily: state => state.Settings.codeFontFamily,
       codeFontSize: state => state.Settings.codeFontSize,
@@ -140,11 +150,8 @@ export default {
         gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
         extraKeys: {
           // 保存修改
-          "Ctrl-S": editor => {
-            this.$store.dispatch("Contents/updateArticle", this.article);
-          },
-          "Cmd-S": editor => {
-            this.$store.dispatch("Contents/updateArticle", this.article);
+          [process.platform === "darwin" ? "Cmd-S" : "Ctrl-S"]: editor => {
+            this.$store.dispatch("Article/updateArticle", this.article);
           }
         }
       };
@@ -162,7 +169,7 @@ export default {
     isMarkDown: function() {
       if (!this.currentLang) {
         this.cm.setOption("mode", "Markdown");
-        this.$store.dispatch("Contents/updateArticle", this.article);
+        this.$store.dispatch("Article/updateArticle", this.article);
         return true;
       }
       return this.currentLang.toLowerCase() === "markdown";
@@ -198,7 +205,7 @@ export default {
 
     currentLang: function(lang) {
       this.article.lang = lang;
-      this.$store.dispatch("Contents/updateArticle", this.article);
+      this.$store.dispatch("Article/updateArticle", this.article);
     }
   },
   methods: {
@@ -221,7 +228,7 @@ export default {
 
       let saveFilePath = path.join(
         this.pathDownload,
-        this.editArticle.title + ".pdf"
+        `${this.editArticle.title}-${new Date().getTime()}.pdf`
       );
 
       // 基础样式
@@ -263,7 +270,7 @@ export default {
     // 保存为图片
     exportAsImage() {
       let code = document.querySelector(".CodeMirror-sizer");
-      let fileName = `${this.editArticle.title}.png`;
+      let fileName = `${this.editArticle.title}-${new Date().getTime()}.png`;
 
       // 获取代码 DOM 的尺寸
       let codeRect = code.getBoundingClientRect();
@@ -300,7 +307,7 @@ export default {
 
     // 保存数据
     handleSave() {
-      this.$store.dispatch("Contents/updateArticle", this.article);
+      this.$store.dispatch("Article/updateArticle", this.article);
       this.$Message.success("保存成功");
     },
 
@@ -313,15 +320,15 @@ export default {
 
     // 退出编辑
     handleCancel() {
-      this.$store.dispatch("Contents/setEditArticle", null);
+      this.$store.dispatch("Article/setEditArticle", null);
     },
 
     handleCMChange(e) {
-      this.$store.dispatch("Contents/updateArticle", this.article);
+      this.$store.dispatch("Article/updateArticle", this.article);
     },
 
     handleTitleChange() {
-      this.$store.dispatch("Contents/updateArticle", this.article);
+      this.$store.dispatch("Article/updateArticle", this.article);
     },
 
     handleToggleWordWrap() {

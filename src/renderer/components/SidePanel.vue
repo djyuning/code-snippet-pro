@@ -48,6 +48,7 @@ export default {
       display: flex;
       flex-grow: 1;
       position: relative;
+      user-select: none;
 
       .icons,
       h4 {

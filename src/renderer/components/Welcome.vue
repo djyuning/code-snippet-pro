@@ -1,7 +1,7 @@
 <template>
   <div class="welcome">
     <div class="welcome-content">
-      <Complete :title-sub="$config.app.title" :contents="$config.app.slogan">
+      <Complete>
         <div slot="cover">
           <img src="static/logo-in-about.png" srcset="static/logo-in-about@2x.png 2x" alt />
         </div>
@@ -14,22 +14,14 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-
 export default {
   name: "Welcome",
   components: {
     Complete: () => import("@/components/Complete")
   },
-  computed: {
-    ...mapState({
-      articles: state => state.Contents.articles
-    })
-  },
   methods: {
     handleCreate() {
-      this.$store.dispatch("Contents/addArticle");
-      this.$store.dispatch("Contents/setEditArticle", this.articles[0]);
+      this.$store.dispatch("Article/addArticle");
     }
   }
 };

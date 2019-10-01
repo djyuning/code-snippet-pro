@@ -24,7 +24,7 @@
         </FormItem>
 
         <FormItem label="名称" prop="title">
-          <Input v-model="formEdit.title" placeholder="请填写目录名称"></Input>
+          <Input v-model="formEdit.title" placeholder="请填写目录名称" autofocus></Input>
         </FormItem>
 
         <FormItem label="备注" prop="remark">
@@ -71,8 +71,7 @@
 </template>
 
 <script>
-import { ipcRenderer } from "electron";
-import { mapState, mapActions } from "vuex";
+import { mapState } from "vuex";
 
 // 默认字段
 const DEFAULT = {
@@ -106,8 +105,8 @@ export default {
   },
   computed: {
     ...mapState({
-      folds: state => state.Contents.folds,
-      appCachePath: state => state.App.appCachePath
+      folds: state => state.Fold.folds,
+      pathAppData: state => state.App.pathAppData
     }),
 
     // 递归处理数组，增加缩进效果
@@ -155,7 +154,7 @@ export default {
     handleSubmit() {
       // 创建到缓存
       this.$store.dispatch(
-        this.formEdit.uuid ? "Contents/updateFold" : "Contents/addFold",
+        this.formEdit.uuid ? "Fold/updateFold" : "Fold/addFold",
         { ...this.formEdit }
       );
       // 关闭弹窗
@@ -168,8 +167,6 @@ export default {
 <style lang="less" scoped>
 .form-wrap {
   margin: -15px;
-  max-height: 360px;
-  overflow: auto;
 }
 
 .form {

@@ -41,7 +41,7 @@ export default {
       document.addEventListener("click", this.blankClick, false);
     },
     blankClick(e) {
-      if (!e.target.closest(".search")) {
+      if (!this.$el.contains(e.target)) {
         this.focus = false;
         document.removeEventListener("click", this.blankClick, false);
       }

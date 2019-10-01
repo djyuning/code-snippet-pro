@@ -9,6 +9,7 @@
         @click="handleClick"
       />
       <span class="name" @click="handleClick">{{ item.title }}</span>
+      <em class="badge" v-if="item.count">{{ item.count }}</em>
       <div v-if="options && item.uuid !== 'default'" class="options">
         <Dropdown placement="bottom-end" @on-click="handleDropdownClick" transfer>
           <Icon class="handle" type="md-settings" />
@@ -19,7 +20,12 @@
         </Dropdown>
       </div>
       <Icon v-if="item.passwordEnable" class="icons" type="md-lock" />
-      <Icon v-if="hasChild" class="icons icons-arrow" type="ios-arrow-down" />
+      <Icon
+        v-if="hasChild"
+        class="icons icons-arrow"
+        type="ios-arrow-down"
+        @click="expand = !expand"
+      />
     </div>
     <SideMenu v-if="hasChild" :level="level + 1" :expand="expand">
       <SideMenuItem
@@ -136,10 +142,6 @@ export default {
     },
 
     handleClick(e) {
-      // 如果有子级，展开子级
-      if (this.hasChild) {
-        this.expand = !this.expand;
-      }
       // 触发条目点击
       this.root.$emit("on-change", this.$props.item);
     }

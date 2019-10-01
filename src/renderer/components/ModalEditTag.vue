@@ -3,7 +3,7 @@
     <div class="form-wrap">
       <Form class="form" ref="form" :model="form" :label-width="120">
         <FormItem label="名称" prop="title">
-          <Input v-model="form.title" placeholder="请填写标签名称"></Input>
+          <Input v-model="form.title" :maxlength="16" placeholder="请填写标签名称" autofocus></Input>
         </FormItem>
 
         <FormItem label="备注" prop="remark">
@@ -11,6 +11,7 @@
             v-model="form.remark"
             type="textarea"
             :autosize="{minRows: 2,maxRows: 5}"
+            :maxlength="100"
             placeholder="请填写备注"
           ></Input>
         </FormItem>
@@ -53,7 +54,6 @@ export default {
       this.$emit("input", val);
     }
   },
-  created() {},
   methods: {
     handleReset() {
       this.form = { ...DEFAULT };
@@ -61,7 +61,7 @@ export default {
     },
     handleSubmit() {
       this.modal = false;
-      this.$store.dispatch("Contents/addTag", this.form);
+      this.$store.dispatch("Tag/addTag", this.form);
     }
   }
 };
