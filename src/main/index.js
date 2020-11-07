@@ -38,6 +38,9 @@ function createWindow() {
     titleBarStyle: 'customButtonsOnHover',
     x: 40,
     y: 40,
+    webPreferences: {
+      nodeIntegration: true
+    },
   })
   
   mainWindow.loadURL(winURL)
