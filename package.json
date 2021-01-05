@@ -57,7 +57,7 @@
   "dependencies": {
     "@babel/core": "^7.0.0",
     "@mdi/font": "^4.4.95",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "babel-plugin-import": "^1.12.1",
     "codemirror": "^5.48.4",
     "hotkeys-js": "^3.7.1",
